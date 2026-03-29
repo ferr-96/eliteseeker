@@ -2,7 +2,8 @@ backend:
   name: github
   repo: ferr-96/eliteseeker
   branch: main
-  base_url: https://decap-oauth.netlify.app
+  auth_type: pkce
+  app_id: decap-cms
 
 media_folder: "images"
 public_folder: "/images"
