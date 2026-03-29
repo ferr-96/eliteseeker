@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EliteSeeker Admin - Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: #0f4c81;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .user-info {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #2ecc71;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #27ae60;
+    }
+    
+    .btn-secondary {
+      background: #34495e;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #2c3e50;
+    }
+    
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+    
+    /* Main Content */
+    .main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 0.5rem;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #666;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.2s;
+    }
+    
+    .tab:hover {
+      background: #e8e8e8;
+    }
+    
+    .tab.active {
+      background: #0f4c81;
+      color: white;
+    }
+    
+    /* Sections */
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: none;
+    }
+    
+    .section.active {
+      display: block;
+    }
+    
+    .section h2 {
+      color: #333;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e8e8e8;
+    }
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #0f4c81;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* Messages */
+    .message {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      display: block;
+    }
+    
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      display: block;
+    }
+    
+    /* Actions Bar */
+    .actions-bar {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #e8e8e8;
+    }
+    
+    /* Import Section */
+    .import-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 2px dashed #ddd;
+    }
+    
+    .import-section h3 {
+      margin-bottom: 1rem;
+      color: #666;
+    }
+    
+    #importFile {
+      display: none;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>EliteSeeker Admin</h1>
+    <div class="header-actions">
+      <span class="user-info">Logged in as <strong id="currentUser">admin</strong></span>
+      <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="message" class="message"></div>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="settings">Site Settings</button>
+      <button class="tab" data-tab="home">Home Page</button>
+      <button class="tab" data-tab="about">About Page</button>
+      <button class="tab" data-tab="contact">Contact Info</button>
+    </div>
+
+    <!-- Site Settings Section -->
+    <section id="settings" class="section active">
+      <h2>Site Settings</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input type="text" id="companyName" data-field="settings.companyName">
+        </div>
+        <div class="form-group">
+          <label for="tagline">Tagline</label>
+          <input type="text" id="tagline" data-field="settings.tagline">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="footerText">Footer Text</label>
+        <textarea id="footerText" data-field="settings.footerText" rows="2"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="logo">Logo Path</label>
+          <input type="text" id="logo" data-field="settings.logo">
+        </div>
+        <div class="form-group">
+          <label for="copyrightYear">Copyright Year</label>
+          <input type="text" id="copyrightYear" data-field="settings.copyrightYear">
+        </div>
+      </div>
+    </section>
+
+    <!-- Home Page Section -->
+    <section id="home" class="section">
+      <h2>Home Page Content</h2>
+      <div class="form-group">
+        <label for="heroTitle">Hero Title</label>
+        <input type="text" id="heroTitle" data-field="home.heroTitle">
+      </div>
+      <div class="form-group">
+        <label for="heroSubtitle">Hero Subtitle</label>
+        <textarea id="heroSubtitle" data-field="home.heroSubtitle" rows="3"></textarea>
+      </div>
+      <h3 style="margin: 1.5rem 0 1rem; color: #666;">Statistics</h3>
+      <div class="stats-grid">
+        <div class="form-group">
+          <label for="statsPlacement">Placements</label>
+          <input type="text" id="statsPlacement" data-field="home.statsPlacement">
+        </div>
+        <div class="form-group">
+          <label for="statsClients">Clients</label>
+          <input type="text" id="statsClients" data-field="home.statsClients">
+        </div>
+        <div class="form-group">
+          <label for="statsYears">Years</label>
+          <input type="text" id="statsYears" data-field="home.statsYears">
+        </div>
+        <div class="form-group">
+          <label for="statsSuccess">Success Rate</label>
+          <input type="text" id="statsSuccess" data-field="home.statsSuccess">
+        </div>
+      </div>
+    </section>
+
+    <!-- About Page Section -->
+    <section id="about" class="section">
+      <h2>About Page Content</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="aboutTitle">Page Title</label>
+          <input type="text" id="aboutTitle" data-field="about.title">
+        </div>
+        <div class="form-group">
+          <label for="aboutSubtitle">Subtitle</label>
+          <input type="text" id="aboutSubtitle" data-field="about.subtitle">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="aboutStory">Our Story</label>
+        <textarea id="aboutStory" data-field="about.story" rows="8"></textarea>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+      <h2>Contact Information</h2>
+      <div class="form-group">
+        <label for="contactAddress">Address</label>
+        <textarea id="contactAddress" data-field="contact.address" rows="2"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contactPhone">Phone</label>
+          <input type="tel" id="contactPhone" data-field="contact.phone">
+        </div>
+        <div class="form-group">
+          <label for="contactEmail">Email</label>
+          <input type="email" id="contactEmail" data-field="contact.email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="contactHours">Business Hours</label>
+        <textarea id="contactHours" data-field="contact.hours" rows="3"></textarea>
+      </div>
+    </section>
+
+    <div class="actions-bar">
+      <button class="btn btn-primary" onclick="saveContent()">💾 Save Changes</button>
+      <button class="btn btn-secondary" onclick="exportContent()">📥 Export JSON</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+      <input type="file" id="importFile" accept=".json" onchange="importContent(event)">
+    </div>
+
+    <div class="import-section">
+      <h3>💡 How to update the live site</h3>
+      <p>1. Make your changes above and click <strong>Save Changes</strong></p>
+      <p>2. Click <strong>Export JSON</strong> to download the content files</p>
+      <p>3. Extract the ZIP and replace the files in the <code>/content/</code> folder</p>
+      <p>4. Commit and push to deploy the changes</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    EliteSeeker Admin Panel &copy; 2024
+  </footer>
+
+  <script>
+    // Session check
+    function checkSession() {
+      const session = sessionStorage.getItem('eliteseeker_session');
+      if (!session) {
+        window.location.href = 'index.html';
+        return false;
+      }
+      
+      const sessionData = JSON.parse(session);
+      if (Date.now() > sessionData.expires) {
+        sessionStorage.removeItem('eliteseeker_session');
+        window.location.href = 'index.html';
+        return false;
+      }
+      
+      document.getElementById('currentUser').textContent = sessionData.user;
+      return true;
+    }
+    
+    if (!checkSession()) {
+      throw new Error('Not authenticated');
+    }
+    
+    // Content storage key
+    const STORAGE_KEY = 'eliteseeker_content';
+    
+    // Default content structure
+    const defaultContent = {
+      settings: {
+        companyName: 'EliteSeeker',
+        tagline: 'Talent Recruitment',
+        logo: '/images/logo.svg',
+        footerText: 'Your trusted recruitment partner in Malaysia. Connecting talent with opportunity since 2014.',
+        copyrightYear: '2024'
+      },
+      home: {
+        heroTitle: 'Find Your Perfect Match in Talent',
+        heroSubtitle: "Malaysia's trusted recruitment partner. We connect exceptional candidates with leading companies, building careers and businesses that thrive.",
+        statsPlacement: '500+',
+        statsClients: '150+',
+        statsYears: '10+',
+        statsSuccess: '95%'
+      },
+      about: {
+        title: 'About EliteSeeker',
+        subtitle: 'Your Trusted Recruitment Partner Since 2014',
+        story: "EliteSeeker was founded with a simple yet powerful mission: to bridge the gap between exceptional talent and outstanding opportunities in Malaysia's dynamic job market.\n\nOver the years, we have grown from a small recruitment firm to one of Malaysia's most trusted talent partners."
+      },
+      contact: {
+        address: 'Level 15, Menara XYZ, Jalan Sultan Ismail, 50250 Kuala Lumpur, Malaysia',
+        phone: '+60 3-XXXX XXXX',
+        email: 'info@eliteseeker.com.my',
+        hours: 'Monday - Friday: 9:00 AM - 6:00 PM\nSaturday: 9:00 AM - 1:00 PM'
+      }
+    };
+    
+    // Load content from localStorage or use defaults
+    function loadContent() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : defaultContent;
+    }
+    
+    // Save content to localStorage
+    function saveToStorage(content) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+    }
+    
+    // Populate form fields
+    function populateForm(content) {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const fieldPath = el.getAttribute('data-field').split('.');
+        let value = content;
+        for (const key of fieldPath) {
+          value = value?.[key];
+        }
+        if (value !== undefined) {
+          el.value = value;
+        }
+      });
+    }
+    
+    // Collect form data
+    function collectFormData() {
+      const content = JSON.parse(JSON.stringify(loadContent()));
+      
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const fieldPath = el.getAttribute('data-field').split('.');
+        let obj = content;
+        for (let i = 0; i < fieldPath.length - 1; i++) {
+          obj = obj[fieldPath[i]];
+        }
+        obj[fieldPath[fieldPath.length - 1]] = el.value;
+      });
+      
+      return content;
+    }
+    
+    // Show message
+    function showMessage(text, type) {
+      const msg = document.getElementById('message');
+      msg.textContent = text;
+      msg.className = 'message ' + type;
+      setTimeout(() => {
+        msg.className = 'message';
+      }, 3000);
+    }
+    
+    // Save content
+    function saveContent() {
+      const content = collectFormData();
+      saveToStorage(content);
+      showMessage('✅ Changes saved successfully!', 'success');
+    }
+    
+    // Export content as JSON files in a zip-like download
+    function exportContent() {
+      const content = collectFormData();
+      
+      // Create individual JSON files
+      const files = {
+        'settings.json': content.settings,
+        'home.json': content.home,
+        'about.json': content.about,
+        'contact.json': content.contact
+      };
+      
+      // Download each file
+      Object.entries(files).forEach(([filename, data]) => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+      
+      showMessage('📥 JSON files downloaded! Replace files in /content/ folder.', 'success');
+    }
+    
+    // Import content from JSON
+    function importContent(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          
+          // Check if it's a full content object or a single section
+          if (imported.settings || imported.home || imported.about || imported.contact) {
+            // Full content object
+            const current = loadContent();
+            const merged = { ...current, ...imported };
+            saveToStorage(merged);
+            populateForm(merged);
+            showMessage('✅ Content imported successfully!', 'success');
+          } else {
+            showMessage('❌ Invalid JSON format', 'error');
+          }
+        } catch (err) {
+          showMessage('❌ Error reading file: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // Reset file input
+    }
+    
+    // Logout
+    function logout() {
+      sessionStorage.removeItem('eliteseeker_session');
+      window.location.href = 'index.html';
+    }
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabName = this.getAttribute('data-tab');
+        
+        // Update active tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show corresponding section
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+      });
+    });
+    
+    // Initialize
+    populateForm(loadContent());
+  </script>
+</body>
+</html>
