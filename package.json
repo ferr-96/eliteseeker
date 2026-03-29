@@ -1,0 +1,26 @@
+{
+  "name": "eliteseeker",
+  "version": "1.0.0",
+  "description": "Professional recruitment agency website for EliteSeeker (Malaysia).",
+  "main": "index.js",
+  "scripts": {
+    "studio": "cd studio && npm run dev",
+    "studio:install": "cd studio && npm install",
+    "studio:deploy": "cd studio && npm run deploy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ferr-96/eliteseeker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ferr-96/eliteseeker/issues"
+  },
+  "homepage": "https://github.com/ferr-96/eliteseeker#readme",
+  "dependencies": {
+    "@sanity/client": "^7.20.0"
+  }
+}
