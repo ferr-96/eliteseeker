@@ -1,6 +1,8 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: ferr-96/eliteseeker
   branch: main
+  base_url: https://decap-oauth.netlify.app
 
 media_folder: "images"
 public_folder: "/images"
@@ -36,17 +38,6 @@ collections:
           - {label: "Phone", name: "phone", widget: "string"}
           - {label: "Email", name: "email", widget: "string"}
           - {label: "Business Hours", name: "hours", widget: "text"}
-
-  - name: "services"
-    label: "Services"
-    folder: "content/services"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Icon (emoji)", name: "icon", widget: "string"}
-      - {label: "Description", name: "description", widget: "text"}
-      - {label: "Order", name: "order", widget: "number"}
 
   - name: "settings"
     label: "Site Settings"
