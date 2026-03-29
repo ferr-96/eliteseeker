@@ -239,6 +239,147 @@
       display: none;
     }
     
+    /* Media Library Styles */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .media-item {
+      position: relative;
+      background: #f8f9fa;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #e0e0e0;
+      transition: all 0.2s;
+    }
+    
+    .media-item:hover {
+      border-color: #0f4c81;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .media-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    
+    .media-item-info {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: #666;
+    }
+    
+    .media-item-name {
+      font-weight: 500;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.25rem;
+    }
+    
+    .media-item-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .media-item-actions .btn {
+      flex: 1;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    .upload-zone {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1.5rem;
+    }
+    
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: #0f4c81;
+      background: #e8f4fd;
+    }
+    
+    .upload-zone-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-zone p {
+      color: #666;
+      margin: 0.5rem 0;
+    }
+    
+    .upload-zone small {
+      color: #999;
+    }
+    
+    #uploadInput {
+      display: none;
+    }
+    
+    .media-empty {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+    
+    .media-empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    .media-loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+    
+    /* Input with upload button */
+    .input-with-upload {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .input-with-upload input {
+      flex: 1;
+    }
+    
+    .input-with-upload .btn {
+      white-space: nowrap;
+    }
+    
+    /* Modal for copy confirmation */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
     /* Footer */
     .footer {
       text-align: center;
@@ -265,6 +406,7 @@
       <button class="tab" data-tab="home">Home Page</button>
       <button class="tab" data-tab="about">About Page</button>
       <button class="tab" data-tab="contact">Contact Info</button>
+      <button class="tab" data-tab="media">📷 Media Library</button>
     </div>
 
     <!-- Site Settings Section -->
@@ -287,7 +429,10 @@
       <div class="form-row">
         <div class="form-group">
           <label for="logo">Logo Path</label>
-          <input type="text" id="logo" data-field="settings.logo">
+          <div class="input-with-upload">
+            <input type="text" id="logo" data-field="settings.logo">
+            <button type="button" class="btn btn-secondary" onclick="openMediaPicker('logo')">📷 Upload</button>
+          </div>
         </div>
         <div class="form-group">
           <label for="copyrightYear">Copyright Year</label>
@@ -344,6 +489,22 @@
       <div class="form-group">
         <label for="aboutStory">Our Story</label>
         <textarea id="aboutStory" data-field="about.story" rows="8"></textarea>
+      </div>
+    </section>
+
+    <!-- Media Library Section -->
+    <section id="media" class="section">
+      <h2>Media Library</h2>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('uploadInput').click()">
+        <div class="upload-zone-icon">📤</div>
+        <p><strong>Click to upload</strong> or drag and drop</p>
+        <small>JPG, PNG, GIF, SVG, WebP • Max 5MB</small>
+      </div>
+      <input type="file" id="uploadInput" accept="image/jpeg,image/png,image/gif,image/svg+xml,image/webp" onchange="handleUpload(event)">
+      
+      <h3 style="margin-bottom: 1rem; color: #666;">Uploaded Images</h3>
+      <div id="mediaGrid" class="media-grid">
+        <div class="media-loading">Loading images...</div>
       </div>
     </section>
 
@@ -585,6 +746,250 @@
     
     // Initialize
     populateForm(loadContent());
+    
+    // ============== MEDIA LIBRARY ==============
+    
+    // Get session token for API calls
+    function getAuthToken() {
+      const session = sessionStorage.getItem('eliteseeker_session');
+      if (session) {
+        return btoa(session); // Base64 encode the session JSON
+      }
+      return null;
+    }
+    
+    // Load media library
+    async function loadMediaLibrary() {
+      const grid = document.getElementById('mediaGrid');
+      grid.innerHTML = '<div class="media-loading">Loading images...</div>';
+      
+      try {
+        const token = getAuthToken();
+        const response = await fetch('/api/media', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to load images');
+        }
+        
+        const data = await response.json();
+        
+        if (data.images && data.images.length > 0) {
+          grid.innerHTML = data.images.map(img => `
+            <div class="media-item" data-filename="${img.filename}">
+              <img src="${img.url}" alt="${img.filename}" onclick="copyImageUrl('${img.url}')" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2212%22>No preview</text></svg>'">
+              <div class="media-item-info">
+                <div class="media-item-name" title="${img.filename}">${img.filename}</div>
+                <div>${formatFileSize(img.size)}</div>
+                <div class="media-item-actions">
+                  <button class="btn btn-secondary" onclick="copyImageUrl('${img.url}')">📋 Copy</button>
+                  <button class="btn btn-danger" onclick="deleteImage('${img.filename}')">🗑️</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          grid.innerHTML = `
+            <div class="media-empty" style="grid-column: 1 / -1;">
+              <div class="media-empty-icon">📷</div>
+              <p>No images uploaded yet</p>
+              <p>Click the upload zone above to add images</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading media:', err);
+        grid.innerHTML = `
+          <div class="media-empty" style="grid-column: 1 / -1;">
+            <div class="media-empty-icon">⚠️</div>
+            <p>Failed to load images</p>
+            <p><small>${err.message}</small></p>
+          </div>
+        `;
+      }
+    }
+    
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    
+    // Handle file upload
+    async function handleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      // Reset input so same file can be uploaded again
+      event.target.value = '';
+      
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        showMessage('❌ Invalid file type. Allowed: JPG, PNG, GIF, SVG, WebP', 'error');
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showMessage('❌ File too large. Maximum size: 5MB', 'error');
+        return;
+      }
+      
+      // Show uploading state
+      const zone = document.getElementById('uploadZone');
+      const originalContent = zone.innerHTML;
+      zone.innerHTML = '<div class="upload-zone-icon">⏳</div><p>Uploading...</p>';
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const token = getAuthToken();
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Upload failed');
+        }
+        
+        showMessage('✅ Image uploaded successfully!', 'success');
+        
+        // Refresh media library
+        loadMediaLibrary();
+        
+        // If there's a pending field to fill, fill it
+        if (pendingFieldId) {
+          document.getElementById(pendingFieldId).value = data.url;
+          pendingFieldId = null;
+        }
+        
+      } catch (err) {
+        console.error('Upload error:', err);
+        showMessage('❌ ' + err.message, 'error');
+      } finally {
+        zone.innerHTML = originalContent;
+      }
+    }
+    
+    // Delete image
+    async function deleteImage(filename) {
+      if (!confirm(`Delete ${filename}?`)) return;
+      
+      try {
+        const token = getAuthToken();
+        const response = await fetch(`/api/media/${encodeURIComponent(filename)}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Delete failed');
+        }
+        
+        showMessage('✅ Image deleted', 'success');
+        loadMediaLibrary();
+        
+      } catch (err) {
+        console.error('Delete error:', err);
+        showMessage('❌ ' + err.message, 'error');
+      }
+    }
+    
+    // Copy image URL to clipboard
+    function copyImageUrl(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('📋 URL copied to clipboard!');
+      }).catch(() => {
+        // Fallback for older browsers
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast('📋 URL copied to clipboard!');
+      });
+    }
+    
+    // Show toast notification
+    function showToast(message) {
+      // Remove existing toast
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      // Trigger animation
+      setTimeout(() => toast.classList.add('show'), 10);
+      
+      // Remove after 2 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 2000);
+    }
+    
+    // Drag and drop support
+    const uploadZone = document.getElementById('uploadZone');
+    
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        // Create a fake event for handleUpload
+        handleUpload({ target: { files: [file], value: '' } });
+      }
+    });
+    
+    // Open media picker and link to a field
+    let pendingFieldId = null;
+    
+    function openMediaPicker(fieldId) {
+      pendingFieldId = fieldId;
+      
+      // Switch to media tab
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('[data-tab="media"]').classList.add('active');
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('media').classList.add('active');
+      
+      // Load media library if not loaded
+      loadMediaLibrary();
+      
+      showMessage('📷 Upload an image or click an existing one to use it', 'success');
+    }
+    
+    // Load media library when media tab is clicked
+    document.querySelector('[data-tab="media"]').addEventListener('click', loadMediaLibrary);
   </script>
 </body>
 </html>
