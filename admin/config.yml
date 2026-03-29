@@ -2,8 +2,6 @@ backend:
   name: github
   repo: ferr-96/eliteseeker
   branch: main
-  auth_type: pkce
-  app_id: decap-cms
 
 media_folder: "images"
 public_folder: "/images"
