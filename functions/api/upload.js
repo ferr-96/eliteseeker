@@ -79,7 +79,7 @@ export async function onRequestPost(context) {
     
     // Return public URL (assuming R2 public access or custom domain)
     // Adjust this URL pattern based on your R2 setup
-    const publicUrl = `https://media.eliteseeker.com.my/${filename}`;
+    const publicUrl = `https://pub-ffa3aaea9bd84ca796cbcc5f75b053f9.r2.dev/${filename}`;
     
     return new Response(JSON.stringify({ 
       success: true,

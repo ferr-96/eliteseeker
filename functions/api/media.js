@@ -27,7 +27,7 @@ export async function onRequestGet(context) {
     
     const images = listed.objects.map(obj => ({
       filename: obj.key,
-      url: `https://media.eliteseeker.com.my/${obj.key}`,
+      url: `https://pub-ffa3aaea9bd84ca796cbcc5f75b053f9.r2.dev/${obj.key}`,
       size: obj.size,
       uploaded: obj.uploaded
     }));
